@@ -1,0 +1,11 @@
+-
+   name: Remove User
+   hosts: localhost
+   become: yes
+   tasks:
+       - name: Remove User
+         user:
+              name: Chala 
+              state: absent
+              remove: yes
+              force: yes

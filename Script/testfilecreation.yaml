@@ -1,0 +1,22 @@
+-
+ name: Create file in remote
+ hosts: all
+ tasks:
+    - name: find remort IP address
+      shell: hostname -I | awk '{print $1}'
+      register: output
+      become: true
+    - name: print
+      debug:
+           msg: "{{ output.stdout }}"
+    - name: create file
+      file:
+          path: /home/AnsibleUser/{{ output.stdout }}
+          state: touch
+       
+    
+      
+ 
+      
+
+    

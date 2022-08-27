@@ -1,0 +1,29 @@
+#!/bin/bash
+
+users=$(ls -l /home | awk '{print $9}')
+#echo "$users"
+validity=$(id users)
+echo "$validity"
+
+ls -l /home | awk '{print $9}' > testUser3
+file=/home/osboxes/testUser3
+while read line
+do
+	str="$line"
+	name=''
+	if [[ $str != '' ]];
+	then
+		str1=$(sudo -l -U $str)
+		#echo "$str1"
+		if [[ $str1 == *"User $line is not allowed to run sudo"* ]]; then
+			name="$str NonSudo"
+		else
+			name="$str Sudo"	
+		fi
+	fi
+	
+	uecho "$name"
+	
+		
+done<$file
+

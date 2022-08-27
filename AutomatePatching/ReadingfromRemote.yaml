@@ -1,0 +1,49 @@
+-
+  name: Read contain from remote
+  hosts: all
+  vars:
+       package: "{{ (data.stdout).split(', ') }}"
+  tasks:
+      - name: Read File From remote
+        shell: |
+               str1=$(cat /home/osboxes/patchTest)
+               str2=${str1:1:-1}
+               echo $str2       
+        register: data
+      - name: Show result
+        debug:
+            msg: "{{ item }}"
+        with_items:
+             - "{{ package }}"
+      - name: Check package installation status
+        shell: |
+               str=$(yum info {{ item }} | grep "Available Packages")
+               if [[ $str == "Available Packages" ]]; then
+                    val=$(yum info {{ item }} | grep -c ": x86_64")
+                    if [[ $val -gt  '1' ]]; then
+                        echo "Yes {{ item }}" >> /home/osboxes/NotInstallPackage
+                    fi
+               fi
+        with_items:
+               - "{{ package }}"
+
+      - name: Check unistall file status
+        shell: | 
+               str=$(cat /home/osboxes/NotInstallPackage)
+               if [[ str == '' ]]; then
+                   echo "Procees"
+               else
+                    echo "Stop"
+               fi
+        register: val
+
+      - name: Result
+        reboot:
+             reboot_timeout: 300
+        when: val.stdout== "Procees"
+
+        
+
+      
+
+        

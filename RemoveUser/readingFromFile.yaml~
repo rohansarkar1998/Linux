@@ -1,0 +1,10 @@
+-
+ name: Reading from file
+ hosts: localhost
+# vars:
+#      contents: "{{ lookup('file','users') }}"
+ tasks:
+      - name: print File
+        {{ lookup('file','val1 file = users delimiter=,') }}
+         debug: 
+           msg: "{{ val1 }}"

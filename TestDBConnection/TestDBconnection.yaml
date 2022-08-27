@@ -1,0 +1,10 @@
+-
+  name: Test DB connection
+  hosts: all
+  tasks:
+    - name: connect to DB
+      mysql_user:
+              name: root
+              pass: Osboxes.org123
+              check_implicit_admin: yes
+      become: true

@@ -1,0 +1,16 @@
+-
+ name: Reading from file
+ hosts: all
+ become: yes
+ vars: 
+     user:  "{{ lookup('file','users').split(',') }}"
+ tasks:
+      - name: print File
+        user:
+              name: '{{ item }}' 
+              state: absent
+              remove: yes
+              force: yes
+ 
+        with_items:
+            - "{{ user }}"

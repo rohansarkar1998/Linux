@@ -1,0 +1,8 @@
+-
+ name: Copy to remote
+ hosts: all
+ tasks:
+    - name: Copy file
+      copy:
+          src: /home/osboxes/UserDeatail.sh
+          dest: /home/AnsibleUser/Tets

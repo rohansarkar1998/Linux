@@ -1,0 +1,20 @@
+-
+ name: Execute Script in remote
+ hosts: all
+ become_user: AnsibleUser
+ tasks:
+     - name: Creating File
+       file:
+          path: /home/AnsibleUser/FindUser.sh
+          state: touch
+
+     - name: Coping script to remote
+       copy:
+          src: /home/osboxes/UserDeatail.sh
+          dest: /home/AnsibleUser/FindUser.sh
+
+     - name: Change File permission
+       command: chmod +x /home/AnsibleUser/FindUser.sh
+
+     - name: Execute script
+       command: sh /home/AnsibleUser/FindUser.sh

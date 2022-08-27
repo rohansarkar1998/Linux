@@ -1,0 +1,120 @@
+-
+ name: Automate Patching
+ hosts: all
+ become: yes
+ gather_facts: true
+ vars:
+     package: "{{ (data.stdout).split(', ') }}"
+ 
+ tasks:
+#     - name: pre Check
+#       shell: systemctl list-units --type=service --state=running >> /home/osboxes/Precheck
+#
+
+     - name: Check for update 
+       yum: list=updates update_cache=true
+       register: yumoutput
+
+     - debug:
+          msg: "{{ yumoutput.results | map(attribute='name') | list }}"
+     
+     - name: Write Output in a file
+       copy:
+           content: "{{ yumoutput.results | map(attribute='name') | list }}"
+           dest: /home/osboxes/patchTest
+
+     - name: Update packages
+       yum:
+           name: '*'
+           state: latest
+       register: status
+
+     - name: SHow Update details
+       debug:
+            msg: "{{ status }}"
+
+
+     - name: Read File From remote
+       shell: |
+               str1=$(cat /home/osboxes/patchTest)
+               str2=${str1:1:-1}
+               echo $str2
+       register: data
+
+     - name: Show result
+       debug:
+            msg: "{{ item }}"
+       with_items:
+             - "{{ package }}"
+
+     - name: Check package installation status
+       shell: |
+               str=$(yum info {{ item }} | grep "Available Packages")
+               if [[ $str == "Available Packages" ]]; then
+                    val=$(yum info {{ item }} | grep -c ": x86_64")
+                    if [[ $val -gt  '1' ]]; then
+                        echo "Yes {{ item }}" >> /home/osboxes/NotInstallPackage
+                    fi
+               fi
+       with_items:
+               - "{{ package }}"
+
+     - name: Check unistall file status
+       shell: |
+               str=$(cat /home/osboxes/NotInstallPackage)
+               if [[ str == '' ]]; then
+                   echo "Procees"
+               else
+                    echo "Procees"
+               fi
+       register: val
+     
+
+     - name: check karnel update
+       shell: |
+          new_karnel=$(rpm -q --last kernel |head -1 | awk '{print $1}' | sed 's/kernel-//')
+          old_karnel=$(uname -r)
+          if [[ $new_karnel != $old_karnel ]]; then
+                echo "Karnel Change"
+          else
+                 echo "Karnel Not Change"
+          fi
+       register: karnel_status 
+
+#     - name: post Check
+#     
+#     shell: systemctl list-units --type=service --state=running >> /home/osboxes/Postcheck
+
+#     - name: Compare pre and post check result
+#       shell: |
+#               pre=$(wc -l < home/AnsibleUser/Precheck)
+#               post=$(wc -l < home/AnsibleUser/Postcheck)
+#               if [[ $pre == $post ]]; then
+#                     echo "same"
+#               else
+#                     echo "diff"
+#                fi
+#       register: preandpoststatus
+   
+#    - name: State
+#      shell: |
+#              str=$($yum info {{ item }} | grep "Installed Packages")
+#              if [[ $str != "Installed Packages" ]]; then
+      
+#
+#             echo "Not Install"
+#              fi
+#      with_items:
+#                - "{{ package }}"
+#      register: package_status
+
+     - name: Reboot server
+       reboot:
+             reboot_timeout: 300
+       when: karnel_status.stdout == "Karnel Change" and val.stdout== "Procees"
+
+
+
+
+
+

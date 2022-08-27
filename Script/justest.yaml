@@ -1,0 +1,10 @@
+-
+  name: test
+  hosts: all
+  tasks:
+    - name: copy code from remote
+      fetch:
+           src: /home/AnsibleUser/FindUser.sh
+           dest: /home/osboxes/Script
+      become: true
+            - 

@@ -1,0 +1,29 @@
+-
+ name: Fetch user details from remote
+ hosts: all
+ tasks:
+   - name: find IP address of remote
+     shell: hostname -I | awk '{print $1}'
+     register: output
+     become: true
+
+   - name: create file in remote
+     file:
+         path: /home/AnsibleUser/{{ output.stdout }}
+         state: touch
+
+   - name: Script that fetch user 
+     script: /home/osboxes/Script/FindUser.sh
+     become: true
+   
+   - name: copy file from remote to local
+     fetch:
+         src: /home/AnsibleUser/{{ output.stdout }}
+         dest: /home/osboxes/Script/ServerUserDetails 
+     become: true   
+   
+   - name: Removing File from remote
+     file:
+        path: /home/AnsibleUser/{{ output.stdout }}
+        state: absent 
+     become: true

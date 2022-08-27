@@ -1,0 +1,3 @@
+#!/bin/bash
+str=$(hostname -i | awk '{print $2}') 
+echo "$str"

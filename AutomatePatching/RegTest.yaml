@@ -1,0 +1,13 @@
+-
+ name: Reg Test
+ hosts: all
+ tasks:
+     - name: Read file from remote
+       shell: |
+              str=$(cat /home/osboxes/regTest)
+              echo $str
+       register: test
+     - name: Writing File
+       copy:
+           content: "{{ test.stdout }}"
+           dest: /home/osboxes/RegTest2
